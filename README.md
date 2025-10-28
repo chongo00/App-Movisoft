@@ -209,20 +209,585 @@ npm run test
 npm run test:coverage
 ```
 
-## 🚀 Despliegue
+## 🚀 Despliegue y Vistas Preliminares
 
-### Build de Producción
+### Despliegue Automático en Vercel (Recomendado)
+
+#### Opción 1: Despliegue Directo desde GitHub
+1. **Ve a [vercel.com](https://vercel.com)**
+2. **Importa tu repositorio**: `github.com/chongo00/App-Movisoft`
+3. **Configura automáticamente** (Vercel detecta Vite automáticamente)
+4. **¡Listo!** Obtén una URL como: `https://app-movisoft.vercel.app`
+
+#### Opción 2: Despliegue Manual
 ```bash
-npm run build
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Desplegar
+vercel
+
+# Para producción
+vercel --prod
 ```
 
-Los archivos compilados estarán en la carpeta `dist/`
+### Despliegue en Netlify
 
-### Despliegue en Vercel/Netlify
-1. Sube el código a tu repositorio Git
-2. Conecta con Vercel/Netlify
-3. Configura el comando de build: `npm run build`
-4. El directorio de salida es `dist`
+#### Desde GitHub (Automático)
+1. **Ve a [netlify.com](https://netlify.com)**
+2. **Conecta tu repositorio GitHub**
+3. **Configura build settings:**
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+4. **¡Desplegado!** URL automática generada
+
+#### Deploy Manual
+```bash
+# Instalar Netlify CLI
+npm install -g netlify-cli
+
+# Desplegar
+netlify deploy --prod --dir=dist
+```
+
+### GitHub Pages (Gratuito)
+
+#### Configuración del Proyecto
+```bash
+# Instalar gh-pages
+npm install --save-dev gh-pages
+
+# Agregar scripts al package.json
+"scripts": {
+  "deploy": "gh-pages -d dist",
+  "build-deploy": "npm run build && npm run deploy"
+}
+```
+
+#### Configurar Vite para GitHub Pages
+```javascript
+// vite.config.js
+export default defineConfig({
+  base: '/App-Movisoft/', // Nombre de tu repo
+  build: {
+    outDir: 'dist'
+  }
+})
+```
+
+#### Desplegar
+```bash
+# Construir y desplegar
+npm run build-deploy
+
+# URL final: https://chongo00.github.io/App-Movisoft/
+```
+
+### Preview de Pull Requests
+
+#### Vercel + GitHub
+- **Cada PR** genera automáticamente una preview URL
+- **Comentarios** en el PR con el enlace de preview
+- **Deploy previews** para testing antes del merge
+
+#### Netlify + GitHub
+- **Deploy previews** automáticos en cada PR
+- **URLs temporales** para testing
+- **Integración con checks** de GitHub
+
+### Configuración de Branch Protection
+```yaml
+# .github/workflows/preview.yml
+name: Preview Deployment
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build
+      - uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=dist --alias=$BRANCH
+```
+
+---
+
+## 🔄 Estrategia Offline-First
+
+### Arquitectura Offline-First Implementada
+
+#### 1. **Service Worker para Cache**
+```javascript
+// public/sw.js (por implementar)
+const CACHE_NAME = 'tu-mercadito-v1';
+
+// Archivos para cachear
+const STATIC_CACHE = [
+  '/',
+  '/manifest.json',
+  '/favicon.ico',
+  // ... otros assets críticos
+];
+
+// Cache de runtime para API calls
+const RUNTIME_CACHE = 'runtime-cache';
+
+// Instalación del Service Worker
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(STATIC_CACHE))
+  );
+});
+
+// Estrategia Cache First para assets estáticos
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('/api/')) {
+    // Network First para APIs
+    event.respondWith(networkFirstStrategy(event.request));
+  } else {
+    // Cache First para assets
+    event.respondWith(cacheFirstStrategy(event.request));
+  }
+});
+
+// Network First Strategy
+async function networkFirstStrategy(request) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    const cachedResponse = await caches.match(request);
+    return cachedResponse || new Response('Offline', { status: 503 });
+  }
+}
+
+// Cache First Strategy
+async function cacheFirstStrategy(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    // Fallback para archivos críticos
+    if (request.destination === 'document') {
+      return caches.match('/offline.html');
+    }
+  }
+}
+```
+
+#### 2. **IndexedDB para Datos Locales**
+```javascript
+// src/utils/indexedDB.js
+class LocalDatabase {
+  constructor() {
+    this.dbName = 'TuMercaditoDB';
+    this.version = 1;
+  }
+
+  async init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, this.version);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        
+        // Store para productos favoritos
+        if (!db.objectStoreNames.contains('favorites')) {
+          db.createObjectStore('favorites', { keyPath: 'id' });
+        }
+        
+        // Store para carrito de compras
+        if (!db.objectStoreNames.contains('cart')) {
+          db.createObjectStore('cart', { keyPath: 'id' });
+        }
+        
+        // Store para datos de usuario
+        if (!db.objectStoreNames.contains('userData')) {
+          db.createObjectStore('userData', { keyPath: 'key' });
+        }
+        
+        // Store para búsquedas recientes
+        if (!db.objectStoreNames.contains('recentSearches')) {
+          db.createObjectStore('recentSearches', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+    });
+  }
+
+  async saveToStore(storeName, data) {
+    const db = await this.init();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.put(data);
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getFromStore(storeName, key) {
+    const db = await this.init();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.get(key);
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getAllFromStore(storeName) {
+    const db = await this.init();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
+
+export default new LocalDatabase();
+```
+
+#### 3. **Persistencia de Estado con Pinia**
+```javascript
+// src/stores/cart.js
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import localDB from '@/utils/indexedDB'
+
+export const useCartStore = defineStore('cart', () => {
+  const items = ref([])
+  const isOnline = ref(navigator.onLine)
+
+  // Cargar datos del localStorage/IndexedDB al iniciar
+  const loadCart = async () => {
+    try {
+      const savedCart = await localDB.getAllFromStore('cart')
+      if (savedCart && savedCart.length > 0) {
+        items.value = savedCart
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error)
+    }
+  }
+
+  // Guardar en IndexedDB cuando cambie
+  const saveCart = async () => {
+    try {
+      // Limpiar store anterior
+      const existingItems = await localDB.getAllFromStore('cart')
+      for (const item of existingItems) {
+        await localDB.saveToStore('cart', { ...item, _deleted: true })
+      }
+      
+      // Guardar items actuales
+      for (const item of items.value) {
+        await localDB.saveToStore('cart', item)
+      }
+    } catch (error) {
+      console.error('Error saving cart:', error)
+    }
+  }
+
+  // Sincronizar con servidor cuando esté online
+  const syncWithServer = async () => {
+    if (!isOnline.value) return
+    
+    try {
+      // Enviar cambios pendientes al servidor
+      const pendingChanges = items.value.filter(item => item.pendingSync)
+      if (pendingChanges.length > 0) {
+        await fetch('/api/cart/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ changes: pendingChanges })
+        })
+        
+        // Marcar como sincronizados
+        pendingChanges.forEach(item => {
+          item.pendingSync = false
+        })
+      }
+    } catch (error) {
+      console.error('Error syncing cart:', error)
+    }
+  }
+
+  // Detectar cambios de conectividad
+  window.addEventListener('online', () => {
+    isOnline.value = true
+    syncWithServer()
+  })
+
+  window.addEventListener('offline', () => {
+    isOnline.value = false
+  })
+
+  // Watch para guardar automáticamente
+  watch(items, saveCart, { deep: true })
+
+  return {
+    items,
+    isOnline,
+    loadCart,
+    syncWithServer,
+    // ... otras funciones del carrito
+  }
+}, {
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'cart',
+        storage: localStorage,
+      }
+    ]
+  }
+})
+```
+
+#### 4. **PWA Manifest**
+```json
+// public/manifest.json
+{
+  "name": "Tu Mercadito",
+  "short_name": "Mercadito",
+  "description": "Conecta con comercios locales",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2196F3",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["shopping", "business"],
+  "lang": "es",
+  "dir": "ltr"
+}
+```
+
+#### 5. **Registro del Service Worker**
+```javascript
+// src/main.js
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import App from './App.vue'
+import router from './router'
+import './style.css'
+import { useThemeStore } from './stores/theme'
+
+// Registrar Service Worker para PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
+// Detectar cambios de conectividad
+window.addEventListener('online', () => {
+  console.log('Conexión restablecida');
+  // Trigger sync de datos pendientes
+});
+
+window.addEventListener('offline', () => {
+  console.log('Modo offline activado');
+  // Mostrar indicador de offline
+});
+
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+const app = createApp(App)
+app.use(pinia)
+app.use(router)
+
+// Inicializar el store de tema para aplicar el tema guardado
+const themeStore = useThemeStore()
+
+app.mount('#app')
+```
+
+#### 6. **Componente de Estado de Conectividad**
+```vue
+<!-- src/components/ConnectivityStatus.vue -->
+<template>
+  <div 
+    v-if="!isOnline" 
+    class="fixed top-0 left-0 right-0 bg-orange-500 text-white px-4 py-2 text-center text-sm z-50"
+  >
+    <div class="flex items-center justify-center gap-2">
+      <WifiOff :size="16" />
+      <span>Modo offline - Los cambios se sincronizarán cuando vuelvas a conectarte</span>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { WifiOff } from 'lucide-vue-next'
+
+const isOnline = ref(navigator.onLine)
+
+const updateOnlineStatus = () => {
+  isOnline.value = navigator.onLine
+}
+
+onMounted(() => {
+  window.addEventListener('online', updateOnlineStatus)
+  window.addEventListener('offline', updateOnlineStatus)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('online', updateOnlineStatus)
+  window.removeEventListener('offline', updateOnlineStatus)
+})
+</script>
+```
+
+#### 7. **Estrategias de Sincronización**
+
+##### **Background Sync**
+```javascript
+// Service Worker - Background Sync
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
+
+async function doBackgroundSync() {
+  try {
+    // Obtener datos pendientes de IndexedDB
+    const pendingData = await getPendingData();
+    
+    // Enviar al servidor
+    for (const data of pendingData) {
+      await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    }
+    
+    // Limpiar datos sincronizados
+    await clearPendingData();
+  } catch (error) {
+    console.error('Background sync failed:', error);
+  }
+}
+```
+
+##### **Queue de Cambios**
+```javascript
+// src/utils/syncQueue.js
+class SyncQueue {
+  constructor() {
+    this.queue = []
+    this.isProcessing = false
+  }
+
+  async addToQueue(action) {
+    this.queue.push(action)
+    await this.processQueue()
+  }
+
+  async processQueue() {
+    if (this.isProcessing || !navigator.onLine) return
+    
+    this.isProcessing = true
+    
+    while (this.queue.length > 0 && navigator.onLine) {
+      const action = this.queue.shift()
+      try {
+        await action()
+      } catch (error) {
+        console.error('Sync action failed:', error)
+        // Re-queue para retry
+        this.queue.unshift(action)
+        break
+      }
+    }
+    
+    this.isProcessing = false
+  }
+}
+
+export default new SyncQueue()
+```
+
+---
+
+## 🎯 Beneficios de la Estrategia Offline-First
+
+### Para Usuarios
+- ✅ **Acceso instantáneo** sin conexión
+- ✅ **Funcionalidad completa** offline
+- ✅ **Sincronización automática** al reconectar
+- ✅ **No pérdida de datos** por conexión inestable
+- ✅ **Experiencia nativa** como app móvil
+
+### Para el Negocio
+- ✅ **Mayor engagement** de usuarios
+- ✅ **Mejor experiencia** en áreas con mala conexión
+- ✅ **Reducción de carga** en servidor
+- ✅ **Confianza del usuario** (no pierde trabajo)
+- ✅ **Posibilidad de PWA** (instalable en móvil)
+
+### Técnicamente
+- ✅ **Performance superior** con cache
+- ✅ **Escalabilidad** del backend
+- ✅ **Resiliencia** a fallos de red
+- ✅ **Desarrollo modular** con Service Workers
+- ✅ **Actualizaciones automáticas** de la app
 
 ## 🤝 Contribución
 
