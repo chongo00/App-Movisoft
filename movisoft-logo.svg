@@ -1,0 +1,15 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo MoviSoft -->
+  <ellipse cx="75" cy="45" rx="55" ry="35" fill="#2196F3" opacity="0.9"/>
+  <ellipse cx="75" cy="45" rx="50" ry="30" fill="#1976D2"/>
+  <ellipse cx="75" cy="45" rx="45" ry="25" fill="#1565C0"/>
+  <ellipse cx="75" cy="45" rx="40" ry="20" fill="#0D47A1"/>
+  
+  <!-- Líneas decorativas -->
+  <path d="M 30 45 Q 45 35, 60 45" stroke="white" stroke-width="2" fill="none" opacity="0.8"/>
+  <path d="M 40 45 Q 55 38, 70 45" stroke="white" stroke-width="2" fill="none" opacity="0.8"/>
+  <path d="M 50 45 Q 62.5 40, 75 45" stroke="white" stroke-width="2" fill="none" opacity="0.8"/>
+  
+  <!-- Texto MoviSoft -->
+  <text x="75" y="100" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1976D2" text-anchor="middle">MoviSoft</text>
+</svg>
