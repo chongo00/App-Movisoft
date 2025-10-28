@@ -789,14 +789,630 @@ export default new SyncQueue()
 - ✅ **Desarrollo modular** con Service Workers
 - ✅ **Actualizaciones automáticas** de la app
 
-## 🤝 Contribución
+## 📱 Conversión a APK Móvil
 
-### Flujo de Trabajo
-1. **Fork** el proyecto
-2. Crea una **branch** para tu feature: `git checkout -b feature/nueva-funcionalidad`
-3. **Commit** tus cambios: `git commit -m 'Agrega nueva funcionalidad'`
-4. **Push** a la branch: `git push origin feature/nueva-funcionalidad`
-5. Abre un **Pull Request**
+### Opción 1: Capacitor (Recomendado para Vue.js)
+
+#### Instalación y Configuración
+```bash
+# Instalar Capacitor
+npm install @capacitor/core @capacitor/cli
+
+# Inicializar Capacitor
+npx cap init "Tu Mercadito" "com.movisoft.tumercadito"
+
+# Agregar plataformas
+npx cap add android
+npx cap add ios
+```
+
+#### Configuración del Proyecto
+```javascript
+// capacitor.config.ts
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.movisoft.tumercadito',
+  appName: 'Tu Mercadito',
+  webDir: 'dist',
+  bundledWebRuntime: false,
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 3000,
+      launchAutoHide: true,
+    },
+    StatusBar: {
+      style: 'default',
+    },
+  },
+};
+
+export default config;
+```
+
+#### Build y Sincronización
+```bash
+# Construir para producción
+npm run build
+
+# Sincronizar con plataformas nativas
+npx cap sync
+
+# Abrir en Android Studio
+npx cap open android
+
+# Abrir en Xcode
+npx cap open ios
+```
+
+### Opción 2: Cordova/PhoneGap
+
+#### Instalación
+```bash
+# Instalar Cordova CLI
+npm install -g cordova
+
+# Crear proyecto Cordova
+cordova create tu-mercadito-app com.movisoft.tumercadito "Tu Mercadito"
+
+# Agregar plataformas
+cd tu-mercadito-app
+cordova platform add android
+cordova platform add ios
+```
+
+#### Configurar Vue.js en Cordova
+```xml
+<!-- config.xml -->
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.movisoft.tumercadito" version="1.0.0" xmlns="http://www.w3.org/ns/widgets">
+    <name>Tu Mercadito</name>
+    <description>Plataforma de comercio local</description>
+    <author email="dev@movisoft.cu">MoviSoft</author>
+    
+    <content src="index.html" />
+    
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    
+    <platform name="android">
+        <preference name="android-targetSdkVersion" value="33" />
+        <icon src="res/icon/android/icon-ldpi.png" density="ldpi" />
+        <icon src="res/icon/android/icon-mdpi.png" density="mdpi" />
+        <icon src="res/icon/android/icon-hdpi.png" density="hdpi" />
+        <icon src="res/icon/android/icon-xhdpi.png" density="xhdpi" />
+        <icon src="res/icon/android/icon-xxhdpi.png" density="xxhdpi" />
+        <icon src="res/icon/android/icon-xxxhdpi.png" density="xxxhdpi" />
+    </platform>
+</widget>
+```
+
+### Opción 3: PWA + TWA (Trusted Web Activity)
+
+#### Configuración PWA
+```javascript
+// vite.config.js
+export default defineConfig({
+  plugins: [
+    vue(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [{
+          urlPattern: /^https:\/\/api\.tumercadito\.com\/.*/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'api-cache',
+            expiration: {
+              maxEntries: 100,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // 1 año
+            }
+          }
+        }]
+      },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      manifest: {
+        name: 'Tu Mercadito',
+        short_name: 'Mercadito',
+        description: 'Conecta con comercios locales',
+        theme_color: '#2196F3',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ]
+})
+```
+
+#### Generar APK desde PWA (TWA)
+```xml
+<!-- AndroidManifest.xml -->
+<application>
+    <activity android:name="com.google.androidbrowserhelper.trusted.TwaLauncherActivity"
+        android:label="Tu Mercadito">
+        <meta-data
+            android:name="android.support.customtabs.trusted.DEFAULT_URL"
+            android:value="https://tumercadito.com" />
+        <meta-data
+            android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+            android:value="#2196F3" />
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+</application>
+```
+
+### Build Final para APK
+```bash
+# Para Capacitor
+npx cap build android
+# Resultado: android/app/build/outputs/apk/debug/app-debug.apk
+
+# Para Cordova
+cordova build android --release
+# Resultado: platforms/android/app/build/outputs/apk/release/app-release.apk
+```
+
+---
+
+## 🌐 Escalabilidad Web y Arquitectura
+
+### Diseño Responsive Optimizado
+
+#### Breakpoints Estratégicos
+```css
+/* tailwind.config.js */
+module.exports = {
+  theme: {
+    screens: {
+      'xs': '475px',   // Teléfonos pequeños
+      'sm': '640px',   // Teléfonos grandes
+      'md': '768px',   // Tablets
+      'lg': '1024px',  // Laptops
+      'xl': '1280px',  // Desktops
+      '2xl': '1536px', // Desktops grandes
+    },
+  }
+}
+```
+
+#### Componentes Adaptativos
+```vue
+<!-- Ejemplo: Grid responsivo -->
+<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <!-- Cards se adaptan automáticamente -->
+</div>
+
+<!-- Ejemplo: Navegación adaptativa -->
+<nav class="hidden md:flex"> <!-- Desktop -->
+<nav class="fixed bottom-0 md:hidden"> <!-- Mobile -->
+```
+
+### Arquitectura Escalabilidad Web
+
+#### 1. **Lazy Loading por Rutas**
+```javascript
+// router/index.js
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/public/HomeView.vue')
+  },
+  {
+    path: '/app',
+    component: () => import('@/layouts/UserLayout.vue'),
+    children: [
+      {
+        path: 'categories',
+        component: () => import('@/views/user/CategoriesView.vue')
+      },
+      {
+        path: 'search',
+        component: () => import('@/views/user/SearchView.vue')
+      },
+      {
+        path: 'profile',
+        component: () => import('@/views/user/ProfileView.vue')
+      }
+    ]
+  }
+]
+```
+
+#### 2. **Componentes Asíncronos**
+```javascript
+// Componente con loading automático
+const LazyComponent = defineAsyncComponent({
+  loader: () => import('@/components/HeavyComponent.vue'),
+  loadingComponent: LoadingSpinner,
+  errorComponent: ErrorComponent,
+  delay: 200,
+  timeout: 3000,
+})
+```
+
+#### 3. **Virtual Scrolling para Listas Grandes**
+```vue
+<template>
+  <virtual-list
+    :data-key="'id'"
+    :data-sources="largeProductList"
+    :data-component="ProductCard"
+    :estimate-size="120"
+    class="h-screen"
+  />
+</template>
+```
+
+### Optimizaciones de Performance
+
+#### Bundle Splitting
+```javascript
+// vite.config.js
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['vue', 'vue-router'],
+          ui: ['lucide-vue-next', '@headlessui/vue'],
+          utils: ['pinia', 'axios'],
+        }
+      }
+    }
+  }
+})
+```
+
+#### Code Splitting por Funcionalidades
+```javascript
+// Ejemplo: Cargar solo cuando se necesita
+const loadMapModule = () => import('@/modules/mapModule')
+const loadPaymentModule = () => import('@/modules/paymentModule')
+```
+
+---
+
+## 🔧 Arquitectura Genérica para Backend
+
+### Stores Preparados para API
+
+#### Patrón de Estado con API
+```javascript
+// src/stores/products.js
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import api from '@/services/api'
+
+export const useProductsStore = defineStore('products', () => {
+  const products = ref([])
+  const loading = ref(false)
+  const error = ref(null)
+
+  // Getters
+  const featuredProducts = computed(() => 
+    products.value.filter(p => p.featured)
+  )
+
+  const productsByCategory = computed(() => (categoryId) =>
+    products.value.filter(p => p.categoryId === categoryId)
+  )
+
+  // Actions
+  const fetchProducts = async (params = {}) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await api.get('/products', { params })
+      products.value = response.data
+    } catch (err) {
+      error.value = err.message
+      console.error('Error fetching products:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const createProduct = async (productData) => {
+    try {
+      const response = await api.post('/products', productData)
+      products.value.push(response.data)
+      return response.data
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  const updateProduct = async (id, updates) => {
+    try {
+      const response = await api.patch(`/products/${id}`, updates)
+      const index = products.value.findIndex(p => p.id === id)
+      if (index > -1) {
+        products.value[index] = { ...products.value[index], ...response.data }
+      }
+      return response.data
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  const deleteProduct = async (id) => {
+    try {
+      await api.delete(`/products/${id}`)
+      products.value = products.value.filter(p => p.id !== id)
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  return {
+    // State
+    products,
+    loading,
+    error,
+    
+    // Getters
+    featuredProducts,
+    productsByCategory,
+    
+    // Actions
+    fetchProducts,
+    createProduct,
+    updateProduct,
+    deleteProduct
+  }
+})
+```
+
+### Servicio API Genérico
+
+#### Configuración Base
+```javascript
+// src/services/api.js
+import axios from 'axios'
+
+// Configuración base
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Interceptors para autenticación
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Interceptor para errores
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado - redirigir a login
+      localStorage.removeItem('auth_token')
+      window.location.href = '/auth/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default api
+```
+
+#### Servicio de Autenticación
+```javascript
+// src/services/auth.js
+import api from './api'
+
+export const authService = {
+  async login(credentials) {
+    const response = await api.post('/auth/login', credentials)
+    const { token, user } = response.data
+    
+    localStorage.setItem('auth_token', token)
+    return { token, user }
+  },
+
+  async register(userData) {
+    const response = await api.post('/auth/register', userData)
+    return response.data
+  },
+
+  async getProfile() {
+    const response = await api.get('/auth/profile')
+    return response.data
+  },
+
+  async updateProfile(userData) {
+    const response = await api.patch('/auth/profile', userData)
+    return response.data
+  },
+
+  async logout() {
+    await api.post('/auth/logout')
+    localStorage.removeItem('auth_token')
+  },
+
+  async refreshToken() {
+    const response = await api.post('/auth/refresh')
+    const { token } = response.data
+    localStorage.setItem('auth_token', token)
+    return token
+  }
+}
+```
+
+### Componentes Preparados para Datos Reales
+
+#### Patrón de Componentes con API
+```vue
+<!-- src/components/ProductCard.vue -->
+<template>
+  <div class="product-card" :class="{ 'loading': loading }">
+    <!-- Skeleton loading -->
+    <div v-if="loading" class="animate-pulse">
+      <div class="bg-gray-300 h-48 rounded-lg mb-4"></div>
+      <div class="bg-gray-300 h-4 rounded w-3/4 mb-2"></div>
+      <div class="bg-gray-300 h-4 rounded w-1/2"></div>
+    </div>
+    
+    <!-- Contenido real -->
+    <div v-else>
+      <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
+      <h3 class="font-semibold text-lg mt-2">{{ product.name }}</h3>
+      <p class="text-gray-600">{{ product.description }}</p>
+      <p class="text-primary-600 font-bold text-xl">${{ product.price }}</p>
+      
+      <!-- WhatsApp button -->
+      <button 
+        v-if="product.whatsappLink"
+        @click="contactWhatsApp"
+        class="whatsapp-btn"
+      >
+        Contactar por WhatsApp
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const props = defineProps({
+  productId: {
+    type: [String, Number],
+    required: true
+  }
+})
+
+const product = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
+// Cargar datos del producto
+const loadProduct = async () => {
+  try {
+    loading.value = true
+    // En desarrollo: datos mock
+    // En producción: api.get(`/products/${props.productId}`)
+    product.value = await getMockProduct(props.productId)
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    loading.value = false
+  }
+}
+
+const contactWhatsApp = () => {
+  if (product.value?.whatsappLink) {
+    window.open(product.value.whatsappLink, '_blank')
+  }
+}
+
+onMounted(() => {
+  loadProduct()
+})
+</script>
+```
+
+### Variables de Entorno
+
+#### Configuración por Entorno
+```javascript
+// .env.development
+VITE_API_URL=http://localhost:3000/api
+VITE_APP_ENV=development
+VITE_GOOGLE_MAPS_API_KEY=your_dev_key
+
+// .env.production
+VITE_API_URL=https://api.tumercadito.com
+VITE_APP_ENV=production
+VITE_GOOGLE_MAPS_API_KEY=your_prod_key
+
+// .env.mobile
+VITE_API_URL=https://mobile-api.tumercadito.com
+VITE_APP_ENV=mobile
+VITE_PWA_ENABLED=true
+```
+
+#### Configuración Condicional
+```javascript
+// src/config/index.js
+const config = {
+  development: {
+    apiUrl: 'http://localhost:3000/api',
+    enableMockData: true,
+    enableDevTools: true,
+  },
+  production: {
+    apiUrl: 'https://api.tumercadito.com',
+    enableMockData: false,
+    enableDevTools: false,
+  },
+  mobile: {
+    apiUrl: 'https://mobile-api.tumercadito.com',
+    enableMockData: false,
+    enablePWA: true,
+  }
+}
+
+const env = import.meta.env.VITE_APP_ENV || 'development'
+export default config[env]
+```
+
+---
+
+## 🎯 Beneficios de la Arquitectura
+
+### Para Desarrollo Móvil
+- ✅ **APK nativo** con Capacitor
+- ✅ **Performance nativa** 
+- ✅ **Acceso a hardware** (GPS, cámara, notificaciones)
+- ✅ **Instalable** desde Play Store/App Store
+- ✅ **Offline-first** mejorado
+
+### Para Escalabilidad Web
+- ✅ **Responsive** automático
+- ✅ **SEO optimizado**
+- ✅ **Performance** superior con lazy loading
+- ✅ **PWA** instalable desde navegador
+- ✅ **Multi-dispositivo** sin cambios
+
+### Para Backend Integration
+- ✅ **API preparada** con servicios modulares
+- ✅ **Autenticación JWT** lista
+- ✅ **Estados de carga** implementados
+- ✅ **Manejo de errores** completo
+- ✅ **Offline sync** preparado
+- ✅ **Migración gradual** de mocks a API real
 
 ### Estándares de Código
 - Usar **Vue 3 Composition API**
