@@ -211,112 +211,24 @@ npm run test:coverage
 
 ## 🚀 Despliegue y Vistas Preliminares
 
-### Despliegue Automático en Vercel (Recomendado)
+### Despliegue Automático en GitHub Pages (Recomendado)
 
-#### Opción 1: Despliegue Directo desde GitHub
-1. **Ve a [vercel.com](https://vercel.com)**
-2. **Importa tu repositorio**: `github.com/chongo00/App-Movisoft`
-3. **Configura automáticamente** (Vercel detecta Vite automáticamente)
-4. **¡Listo!** Obtén una URL como: `https://app-movisoft.vercel.app`
+#### Configuración Automática
+1. **El proyecto ya está configurado** para GitHub Pages
+2. **Cada push a main** despliega automáticamente
+3. **URL fija:** `https://chongo00.github.io/App-Movisoft/`
 
-#### Opción 2: Despliegue Manual
+#### Comandos de Despliegue
 ```bash
-# Instalar Vercel CLI
-npm i -g vercel
+# Desplegar manualmente (si es necesario)
+npm run deploy
 
-# Desplegar
-vercel
-
-# Para producción
-vercel --prod
+# Ver en desarrollo
+npm run dev
 ```
 
-### Despliegue en Netlify
-
-#### Desde GitHub (Automático)
-1. **Ve a [netlify.com](https://netlify.com)**
-2. **Conecta tu repositorio GitHub**
-3. **Configura build settings:**
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-4. **¡Desplegado!** URL automática generada
-
-#### Deploy Manual
-```bash
-# Instalar Netlify CLI
-npm install -g netlify-cli
-
-# Desplegar
-netlify deploy --prod --dir=dist
-```
-
-### GitHub Pages (Gratuito)
-
-#### Configuración del Proyecto
-```bash
-# Instalar gh-pages
-npm install --save-dev gh-pages
-
-# Agregar scripts al package.json
-"scripts": {
-  "deploy": "gh-pages -d dist",
-  "build-deploy": "npm run build && npm run deploy"
-}
-```
-
-#### Configurar Vite para GitHub Pages
-```javascript
-// vite.config.js
-export default defineConfig({
-  base: '/App-Movisoft/', // Nombre de tu repo
-  build: {
-    outDir: 'dist'
-  }
-})
-```
-
-#### Desplegar
-```bash
-# Construir y desplegar
-npm run build-deploy
-
-# URL final: https://chongo00.github.io/App-Movisoft/
-```
-
-### Preview de Pull Requests
-
-#### Vercel + GitHub
-- **Cada PR** genera automáticamente una preview URL
-- **Comentarios** en el PR con el enlace de preview
-- **Deploy previews** para testing antes del merge
-
-#### Netlify + GitHub
-- **Deploy previews** automáticos en cada PR
-- **URLs temporales** para testing
-- **Integración con checks** de GitHub
-
-### Configuración de Branch Protection
-```yaml
-# .github/workflows/preview.yml
-name: Preview Deployment
-on:
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  preview:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm ci
-      - run: npm run build
-      - uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=dist --alias=$BRANCH
-```
+#### Actualizaciones Automáticas
+Cada vez que hagas `git push origin main`, el sitio se actualiza automáticamente en GitHub Pages.
 
 ---
 
