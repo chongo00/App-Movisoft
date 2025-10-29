@@ -211,24 +211,34 @@ npm run test:coverage
 
 ## 🚀 Despliegue y Vistas Preliminares
 
-### Despliegue Automático en GitHub Pages (Recomendado)
+### Despliegue Automático en GitHub Pages
 
-#### Configuración Automática
-1. **El proyecto ya está configurado** para GitHub Pages
-2. **Cada push a main** despliega automáticamente
-3. **URL fija:** `https://chongo00.github.io/App-Movisoft/`
+#### ✅ Configuración Automática
+- **GitHub Actions** configurado para despliegue automático
+- **Cada push a main** activa el despliegue automáticamente
+- **URL fija:** `https://chongo00.github.io/App-Movisoft/`
+- **Tiempo de despliegue:** 2-3 minutos
 
-#### Comandos de Despliegue
+#### 🔄 Proceso Automático
+1. **Push a main** → GitHub Actions detecta cambios
+2. **Instala dependencias** → `npm ci`
+3. **Build optimizado** → `npm run build`
+4. **Deploy automático** → Publica en GitHub Pages
+
+#### 📊 Estado del Despliegue
+Ve el estado en: [GitHub Actions](https://github.com/chongo00/App-Movisoft/actions)
+
+#### Comandos Locales
 ```bash
-# Desplegar manualmente (si es necesario)
-npm run deploy
-
-# Ver en desarrollo
+# Desarrollo local
 npm run dev
+
+# Build local (para testing)
+npm run build
 ```
 
 #### Actualizaciones Automáticas
-Cada vez que hagas `git push origin main`, el sitio se actualiza automáticamente en GitHub Pages.
+Cada vez que hagas `git push origin main`, el sitio se actualiza automáticamente.
 
 ---
 

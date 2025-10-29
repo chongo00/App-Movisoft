@@ -61,24 +61,33 @@ https://chongo00.github.io/App-Movisoft/
 
 ---
 
-## Despliegue Automático Configurado
+## 🚀 Despliegue Automático Configurado
 
-### **Configuración Actual:**
+### ✅ **Configuración Actual:**
 - **Plataforma:** GitHub Pages
-- **Actualización:** Automática en cada push
-- **Build:** Optimizado para producción
-- **Performance:** Máxima velocidad
+- **Automatización:** GitHub Actions
+- **Actualización:** Automática en cada push a main
+- **Tiempo:** 2-3 minutos por despliegue
+- **Monitoreo:** [GitHub Actions](https://github.com/chongo00/App-Movisoft/actions)
 
-### **Comandos Disponibles:**
+### ✅ **Proceso Automático:**
+1. **Haces cambios** en el código
+2. **Git push origin main** → Despliegue automático
+3. **GitHub Actions** ejecuta build y deploy
+4. **Sitio actualizado** en 2-3 minutos
+
+### ✅ **Comandos Disponibles:**
 ```bash
 # Ver en desarrollo
 npm run dev
 
-# Desplegar manualmente
-npm run deploy
-
-# Build local
+# Build local (para testing)
 npm run build
+
+# Push y despliegue automático
+git add .
+git commit -m "Nuevos cambios"
+git push origin main
 ```
 
 ---
