@@ -7,13 +7,13 @@
     <header
       v-if="isDesktop"
       class="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm z-20 lg:pl-0"
-      :class="{ 'lg:ml-64': !sidebarOpen }"
+      :class="{ 'lg:ml-64': sidebarOpen }"
     >
       <div class="flex items-center justify-between h-full px-4">
         <div class="flex items-center gap-4">
           <button
             @click="sidebarOpen = !sidebarOpen"
-            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <Menu :size="20" class="text-gray-600 dark:text-gray-400" />
           </button>
@@ -25,7 +25,8 @@
         <!-- User menu -->
         <div class="relative">
           <button
-            @click="userMenuOpen = !userMenuOpen"
+            ref="userMenuButton"
+            @click.stop="toggleUserMenu"
             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <div class="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
@@ -43,14 +44,13 @@
             ref="userMenu"
             class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
           >
-            <router-link
-              to="/app/profile"
-              @click="userMenuOpen = false"
-              class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            <button
+              @click="openSettings"
+              class="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             >
               <Settings :size="16" />
-              <span>Perfil</span>
-            </router-link>
+              <span>Ajustes</span>
+            </button>
 
             <button
               @click="handleLogout"
@@ -73,15 +73,18 @@
 
     <!-- Contenido principal -->
     <main
-      class="pb-20"
+      class="pb-20 transition-all duration-300 ease-out"
       :class="{
-        'lg:ml-64': !isDesktop || sidebarOpen,
-        'pt-16': isDesktop
+        'lg:ml-64': sidebarOpen,
+        'pt-16': isDesktop,
+        'animate-slide-left': swipeDirection === 'left',
+        'animate-slide-right': swipeDirection === 'right'
       }"
       @touchstart="handleTouchStart"
       @touchend="handleTouchEnd"
     >
       <RouterView />
+      <SettingsModal />
     </main>
 
     <!-- Navegación inferior (solo móvil) -->
@@ -93,6 +96,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useUiStore } from '../stores/ui'
 import {
   Menu,
   User,
@@ -102,15 +106,18 @@ import {
 } from 'lucide-vue-next'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import BottomNavigation from '../components/BottomNavigation.vue'
+import SettingsModal from '../components/SettingsModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 
 // Estados
 const sidebarOpen = ref(false)
 const userMenuOpen = ref(false)
 const userMenu = ref(null)
+const userMenuButton = ref(null)
 
 // Detectar si es desktop
 const isDesktop = computed(() => {
@@ -137,6 +144,7 @@ const touchStartX = ref(0)
 const touchStartY = ref(0)
 const touchEndX = ref(0)
 const touchEndY = ref(0)
+const swipeDirection = ref(null)
 
 // Items de navegación para swipe
 const navItems = [
@@ -155,6 +163,7 @@ const getCurrentIndex = () => {
 const handleTouchStart = (e) => {
   touchStartX.value = e.changedTouches[0].screenX
   touchStartY.value = e.changedTouches[0].screenY
+  swipeDirection.value = null
 }
 
 const handleTouchEnd = (e) => {
@@ -178,19 +187,33 @@ const handleSwipeGesture = () => {
 
     if (deltaX > 0) {
       // Swipe izquierda -> siguiente página
+      swipeDirection.value = 'left'
       newIndex = Math.min(currentIndex + 1, navItems.length - 1)
     } else {
       // Swipe derecha -> página anterior
+      swipeDirection.value = 'right'
       newIndex = Math.max(currentIndex - 1, 0)
     }
 
     if (newIndex !== currentIndex) {
       router.push(navItems[newIndex].path)
+      return
     }
   }
+
+  swipeDirection.value = null
 }
 
 // Funciones
+const toggleUserMenu = () => {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+const openSettings = () => {
+  uiStore.openSettings()
+  userMenuOpen.value = false
+}
+
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
@@ -200,9 +223,18 @@ const handleLogout = () => {
 
 // Click outside para cerrar menú
 const handleClickOutside = (event) => {
-  if (userMenu.value && !userMenu.value.contains(event.target)) {
-    userMenuOpen.value = false
+  const menuEl = userMenu.value
+  const buttonEl = userMenuButton.value
+
+  if (menuEl && menuEl.contains(event.target)) {
+    return
   }
+
+  if (buttonEl && buttonEl.contains(event.target)) {
+    return
+  }
+
+  userMenuOpen.value = false
 }
 
 // Lifecycle

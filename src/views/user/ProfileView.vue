@@ -6,7 +6,7 @@
       <div class="absolute top-4 right-4">
         <Tooltip content="Configuración">
           <button
-            @click="showSettingsModal = true"
+            @click="uiStore.openSettings()"
             class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
           >
             <Settings :size="20" />
@@ -21,9 +21,9 @@
         </div>
 
         <div>
-          <h1 class="text-2xl font-bold">{{ authStore.currentUser?.name || 'Usuario' }}</h1>
+          <h1 class="text-2xl font-bold">{{ displayName }}</h1>
           <p class="text-primary-100">{{ authStore.currentUser?.email || 'usuario@email.com' }}</p>
-          <p class="text-primary-200 text-sm mt-1">Cliente desde enero 2024</p>
+          <p class="text-primary-200 text-sm mt-1">Miembro activo desde enero 2024</p>
         </div>
       </div>
     </div>
@@ -31,18 +31,24 @@
     <!-- Contenido principal -->
     <div class="p-4 space-y-4">
       <!-- Estadísticas rápidas -->
-      <div class="grid grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm text-center">
-          <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ stats.pedidos }}</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Pedidos</div>
+      <div class="grid grid-cols-3 gap-3 sm:gap-4">
+        <div class="bg-white dark:bg-gray-800 px-3 py-4 sm:px-4 sm:py-5 rounded-xl shadow-sm text-center flex flex-col items-center justify-center gap-1">
+          <div class="text-lg sm:text-2xl font-bold text-primary-600 dark:text-primary-400 leading-tight tracking-tight whitespace-nowrap">
+            {{ stats.pedidos }}
+          </div>
+          <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Pedidos</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm text-center">
-          <div class="text-2xl font-bold text-green-600 dark:text-green-400">${{ stats.gastado }}</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Gastado</div>
+        <div class="bg-white dark:bg-gray-800 px-3 py-4 sm:px-4 sm:py-5 rounded-xl shadow-sm text-center flex flex-col items-center justify-center gap-1">
+          <div class="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400 leading-tight tracking-tight whitespace-nowrap">
+            ${{ stats.gastado }}
+          </div>
+          <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Gastado</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm text-center">
-          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ stats.favoritos }}</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Favoritos</div>
+        <div class="bg-white dark:bg-gray-800 px-3 py-4 sm:px-4 sm:py-5 rounded-xl shadow-sm text-center flex flex-col items-center justify-center gap-1">
+          <div class="text-lg sm:text-2xl font-bold text-purple-600 dark:text-purple-400 leading-tight tracking-tight whitespace-nowrap">
+            {{ stats.favoritos }}
+          </div>
+          <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Favoritos</div>
         </div>
       </div>
 
@@ -142,43 +148,13 @@
     </div>
 
     <!-- Modales -->
-    <!-- Modal de configuración -->
-    <Modal
-      :is-open="showSettingsModal"
-      title="Configuración"
-      icon="Settings"
-      @close="showSettingsModal = false"
-    >
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-medium text-gray-900 dark:text-white mb-3">Apariencia</h4>
-          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <span class="text-gray-700 dark:text-gray-300">Modo oscuro</span>
-            <ThemeToggle variant="minimal" />
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-medium text-gray-900 dark:text-white mb-3">Notificaciones</h4>
-          <div class="space-y-3">
-            <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <span class="text-gray-700 dark:text-gray-300">Pedidos nuevos</span>
-              <input type="checkbox" class="rounded text-primary-600" checked>
-            </label>
-            <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <span class="text-gray-700 dark:text-gray-300">Promociones</span>
-              <input type="checkbox" class="rounded text-primary-600" checked>
-            </label>
-          </div>
-        </div>
-      </div>
-    </Modal>
+    <SettingsModal />
 
     <!-- Modal de soporte -->
     <Modal
       :is-open="showSupportModal"
       title="Centro de Ayuda"
-      icon="HelpCircle"
+      :icon="HelpCircle"
       @close="showSupportModal = false"
     >
       <div class="space-y-4">
@@ -206,7 +182,7 @@
     <Modal
       :is-open="showLogoutModal"
       title="Cerrar Sesión"
-      icon="LogOut"
+      :icon="LogOut"
       @close="showLogoutModal = false"
       :actions="[
         { key: 'cancel', label: 'Cancelar', variant: 'secondary' },
@@ -222,10 +198,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useThemeStore } from '../../stores/theme'
+import { useUiStore } from '../../stores/ui'
+import SettingsModal from '../../components/SettingsModal.vue'
 import {
   User,
   Settings,
@@ -249,7 +227,7 @@ const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 // Estados de modales
-const showSettingsModal = ref(false)
+const uiStore = useUiStore()
 const showSupportModal = ref(false)
 const showNotificationsModal = ref(false)
 const showPrivacyModal = ref(false)
@@ -261,6 +239,8 @@ const stats = ref({
   gastado: 2450,
   favoritos: 8
 })
+
+const displayName = computed(() => authStore.currentUser?.name || 'Usuario')
 
 const recentActivities = ref([
   {

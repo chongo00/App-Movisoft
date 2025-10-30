@@ -1,9 +1,90 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'pb-20': authStore.isAuthenticated && authStore.isCommonUser }">
+    <DesktopSidebar
+      v-if="authStore.isAuthenticated && authStore.isCommonUser"
+      :is-open="desktopSidebarOpen"
+      @close="desktopSidebarOpen = false"
+    />
+
+    <div
+      v-if="desktopSidebarOpen"
+      class="hidden lg:block fixed inset-0 bg-black/50 z-30"
+      @click="desktopSidebarOpen = false"
+    ></div>
+
+    <div
+      class="transition-all duration-300"
+      :class="{ 'lg:ml-64': desktopSidebarOpen }"
+    >
+    <!-- Barra superior solo web -->
+    <div
+      v-if="authStore.isAuthenticated && authStore.isCommonUser"
+      class="hidden lg:flex items-center justify-between px-6 py-3 border-b border-gray-200 dark:border-primary-600/40 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+    >
+      <div class="flex items-center gap-3">
+        <button
+          @click="desktopSidebarOpen = !desktopSidebarOpen"
+          class="p-2 rounded-lg transition-colors text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <div class="w-6 h-6 flex flex-col justify-center items-center">
+            <span class="block w-5 h-0.5 bg-current mb-1 transition-all duration-300" :class="{ 'rotate-45 translate-y-1.5': desktopSidebarOpen }"></span>
+            <span class="block w-5 h-0.5 bg-current mb-1 transition-all duration-300" :class="{ 'opacity-0': desktopSidebarOpen }"></span>
+            <span class="block w-5 h-0.5 bg-current transition-all duration-300" :class="{ '-rotate-45 -translate-y-1.5': desktopSidebarOpen }"></span>
+          </div>
+        </button>
+        <span class="text-lg font-semibold">Inicio</span>
+      </div>
+
+      <div class="relative">
+        <button 
+          @click="toggleUserMenu"
+          class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-primary-900/40 dark:text-primary-100 dark:hover:bg-primary-800/40"
+        >
+          <User :size="18" />
+          <span>{{ authStore.currentUser?.name || 'Usuario' }}</span>
+          <ChevronDown :size="14" :class="{ 'rotate-180': isUserMenuOpen }" class="transition-transform duration-200" />
+        </button>
+
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0 scale-95 translate-y-[-10px]"
+          enter-to-class="opacity-100 scale-100 translate-y-0"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100 scale-100 translate-y-0"
+          leave-to-class="opacity-0 scale-95 translate-y-[-10px]"
+        >
+          <div 
+            v-if="isUserMenuOpen"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+            @click.stop
+          >
+            <div class="px-4 py-2 border-b border-gray-100">
+              <p class="text-sm font-medium text-gray-900">{{ authStore.currentUser?.name || 'Usuario' }}</p>
+              <p class="text-xs text-gray-500">{{ authStore.currentUser?.email || 'usuario@email.com' }}</p>
+            </div>
+            <button 
+              @click="goToProfile"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+            >
+              <User :size="16" />
+              Ver Perfil
+            </button>
+            <button 
+              @click="handleLogout"
+              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+            >
+              <LogOut :size="16" />
+              Cerrar Sesión
+            </button>
+          </div>
+        </Transition>
+      </div>
+    </div>
+
     <!-- Header con logo y menú hamburguesa -->
     <header class="bg-gradient-to-br from-primary-600 to-primary-400 text-white relative">
       <div class="container mx-auto px-4 py-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between" :class="{ 'lg:hidden': authStore.isAuthenticated && authStore.isCommonUser }">
           <!-- Botón menú hamburguesa (solo para no autenticados) -->
           <button 
             v-if="!authStore.isAuthenticated"
@@ -66,6 +147,13 @@
                     Ver Perfil
                   </button>
                   <button 
+                    @click="openSettings"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Settings :size="16" />
+                    Ajustes
+                  </button>
+                  <button 
                     @click="handleLogout"
                     class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                   >
@@ -116,7 +204,7 @@
     <!-- Menú lateral deslizable (solo para no autenticados) -->
     <div 
       v-if="isMenuOpen && !authStore.isAuthenticated"
-      class="fixed inset-0 z-50 lg:hidden"
+      class="fixed inset-0 z-50"
       @click="toggleMenu"
     >
       <!-- Overlay -->
@@ -124,7 +212,7 @@
       
       <!-- Panel lateral -->
       <div 
-        class="absolute left-0 top-0 h-full w-80 max-w-[90vw] bg-gradient-to-br from-primary-600 to-primary-400 text-white shadow-2xl transform transition-transform duration-300 ease-in-out"
+        class="absolute left-0 top-0 h-full w-80 max-w-[90vw] bg-gradient-to-br from-primary-600 to-primary-400 text-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col"
         @click.stop
       >
         <!-- Header del menú -->
@@ -279,7 +367,7 @@
     </Transition>
 
     <!-- Empresas destacadas -->
-    <section class="container mx-auto px-4 py-6">
+    <section id="companies" class="container mx-auto px-4 py-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-800 dark:text-white">Empresas Destacadas</h2>
         <router-link to="/auth/login-common" class="text-sm text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
@@ -318,24 +406,34 @@
     </footer>
 
     <!-- Navegación inferior para usuarios comunes autenticados -->
-    <BottomNavigation v-if="authStore.isAuthenticated && authStore.isCommonUser" />
+    <!-- <BottomNavigation v-if="authStore.isAuthenticated && authStore.isCommonUser" /> -->
+    <div class="lg:hidden">
+      <BottomNavigation v-if="authStore.isAuthenticated && authStore.isCommonUser" />
+    </div>
+    <SettingsModal />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Package, Store, MapPin, Utensils, Shirt, Laptop, Home as HomeIcon, X, User, ChevronDown, LogOut, MessageCircle } from 'lucide-vue-next'
+import { Search, Package, Store, MapPin, Utensils, Shirt, Laptop, Home as HomeIcon, X, User, ChevronDown, LogOut, MessageCircle, Settings } from 'lucide-vue-next'
 import ProductSkeleton from '../components/ProductSkeleton.vue'
 import Tooltip from '../components/Tooltip.vue'
 import { useAuthStore } from '../stores/auth'
 import BottomNavigation from '../components/BottomNavigation.vue'
+import SettingsModal from '../components/SettingsModal.vue'
+import { useUiStore } from '../stores/ui'
+import DesktopSidebar from '../components/DesktopSidebar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const searchQuery = ref('')
 const isMenuOpen = ref(false)
 const isUserMenuOpen = ref(false)
+const uiStore = useUiStore()
+const desktopSidebarOpen = ref(false)
 
 const quickCategories = ref([
   { id: 1, name: 'Alimentos' },
@@ -419,15 +517,23 @@ const toggleMenu = () => {
 }
 
 const scrollToSection = (sectionId) => {
-  toggleMenu()
-  const element = document.getElementById(sectionId)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
+  isMenuOpen.value = false
+
+  nextTick(() => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  })
 }
 
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value
+}
+
+const openSettings = () => {
+  uiStore.openSettings()
+  isUserMenuOpen.value = false
 }
 
 const goToProfile = () => {
@@ -500,6 +606,7 @@ const handleLogout = () => {
 
 /* Line clamp para textos largos */
 .line-clamp-2 {
+  line-clamp: 2;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

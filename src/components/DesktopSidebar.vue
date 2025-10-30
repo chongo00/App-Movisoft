@@ -8,9 +8,7 @@
     <!-- Header del sidebar -->
     <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-          <component :is="MoviSoftLogo" class="w-6 h-6 text-white" />
-        </div>
+        <img src="/logo.png" alt="Tu Mercadito" class="w-10 h-10 rounded-xl object-cover" />
         <span class="font-semibold text-gray-900 dark:text-white">Tu Mercadito</span>
       </div>
       <button
@@ -59,14 +57,13 @@
 
       <!-- Botones de acción -->
       <div class="space-y-2">
-        <router-link
-          to="/app/profile"
-          @click="$emit('close')"
-          class="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        <button
+          @click="uiStore.openSettings(); $emit('close')"
+          class="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-lg text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
         >
           <Settings :size="16" />
-          <span>Perfil</span>
-        </router-link>
+          <span>Ajustes</span>
+        </button>
 
         <button
           @click="handleLogout"
@@ -91,6 +88,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useUiStore } from '../stores/ui'
 import {
   Home,
   FolderTree,
@@ -115,6 +113,7 @@ defineEmits(['close'])
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 
 // Detectar si es desktop
 const isDesktop = computed(() => {

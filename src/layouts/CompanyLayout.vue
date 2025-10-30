@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
     <div class="flex h-screen overflow-hidden">
       <!-- Sidebar -->
       <aside class="hidden md:flex md:flex-shrink-0">
-        <div class="flex flex-col w-64 bg-white border-r border-gray-200">
+        <div class="flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
           <!-- Logo/Header -->
-          <div class="flex items-center h-16 px-6 border-b border-gray-200">
-            <h1 class="text-xl font-bold text-primary-600">Tu Mercadito</h1>
+          <div class="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">Tu Mercadito</h1>
           </div>
 
           <!-- Navigation -->
@@ -17,8 +17,8 @@
               :to="item.route"
               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors"
               :class="isActive(item.route) 
-                ? 'bg-primary-50 text-primary-700' 
-                : 'text-gray-700 hover:bg-gray-100'"
+                ? 'bg-primary-100/80 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' 
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'"
             >
               <component :is="item.icon" :size="20" class="mr-3" />
               {{ item.label }}
@@ -26,10 +26,10 @@
           </nav>
 
           <!-- User menu -->
-          <div class="p-4 border-t border-gray-200">
+          <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <button 
               @click="handleLogout"
-              class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50"
+              class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30"
             >
               <LogOut :size="20" class="mr-3" />
               Cerrar Sesión
@@ -39,12 +39,12 @@
       </aside>
 
       <!-- Main content -->
-      <div class="flex-1 overflow-auto">
+      <div class="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         <!-- Mobile header -->
-        <header class="md:hidden bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+        <header class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-10">
           <div class="flex items-center justify-between">
-            <h1 class="text-lg font-bold text-primary-600">Tu Mercadito</h1>
-            <button @click="toggleMobileMenu" class="text-gray-600">
+            <h1 class="text-lg font-bold text-primary-600 dark:text-primary-400">Tu Mercadito</h1>
+            <button @click="toggleMobileMenu" class="text-gray-600 dark:text-gray-200">
               <Menu :size="24" />
             </button>
           </div>
@@ -64,12 +64,12 @@
       @click="toggleMobileMenu"
     >
       <div class="fixed inset-0 bg-black opacity-50"></div>
-      <aside class="fixed inset-y-0 left-0 w-64 bg-white z-50">
+      <aside class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 z-50 shadow-xl">
         <div class="flex flex-col h-full">
           <!-- Logo/Header -->
-          <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-            <h1 class="text-xl font-bold text-primary-600">Tu Mercadito</h1>
-            <button @click="toggleMobileMenu" class="text-gray-600">
+          <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-xl font-bold text-primary-600 dark:text-primary-400">Tu Mercadito</h1>
+            <button @click="toggleMobileMenu" class="text-gray-600 dark:text-gray-200">
               <X :size="24" />
             </button>
           </div>
@@ -83,8 +83,8 @@
               @click="toggleMobileMenu"
               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors"
               :class="isActive(item.route) 
-                ? 'bg-primary-50 text-primary-700' 
-                : 'text-gray-700 hover:bg-gray-100'"
+                ? 'bg-primary-100/80 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' 
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'"
             >
               <component :is="item.icon" :size="20" class="mr-3" />
               {{ item.label }}
@@ -92,10 +92,10 @@
           </nav>
 
           <!-- User menu -->
-          <div class="p-4 border-t border-gray-200">
+          <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <button 
               @click="handleLogout"
-              class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50"
+              class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30"
             >
               <LogOut :size="20" class="mr-3" />
               Cerrar Sesión
@@ -111,6 +111,7 @@
 import { ref, computed } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 import { 
   LayoutDashboard, 
   Building2, 
@@ -125,6 +126,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 const showMobileMenu = ref(false)
 
 const menuItems = [
@@ -136,7 +138,10 @@ const menuItems = [
 ]
 
 const isActive = (routePath) => {
-  return route.path.startsWith(routePath)
+  if (routePath === '/dashboard') {
+    return route.path === '/dashboard'
+  }
+  return route.path === routePath || route.path.startsWith(`${routePath}/`)
 }
 
 const toggleMobileMenu = () => {

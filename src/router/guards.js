@@ -7,7 +7,7 @@ export function requireAuth(to, from, next) {
   const authStore = useAuthStore()
   
   if (!authStore.isAuthenticated) {
-    next({ name: 'welcome' })
+    next({ name: 'home' })
   } else {
     next()
   }
@@ -20,7 +20,7 @@ export function requireCompanyRole(to, from, next) {
   const authStore = useAuthStore()
   
   if (!authStore.isAuthenticated) {
-    next({ name: 'welcome' })
+    next({ name: 'home' })
   } else if (!authStore.isCompanyUser) {
     // Si está autenticado pero no es empresa, redirigir al home
     next({ name: 'home' })
@@ -36,7 +36,7 @@ export function requireCommonRole(to, from, next) {
   const authStore = useAuthStore()
   
   if (!authStore.isAuthenticated) {
-    next({ name: 'welcome' })
+    next({ name: 'home' })
   } else if (!authStore.isCommonUser) {
     // Si está autenticado pero no es usuario común, redirigir a dashboard
     next({ name: 'company-dashboard' })
