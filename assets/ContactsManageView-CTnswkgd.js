@@ -1,0 +1,1 @@
+import{c as a,d as e,o as s}from"./index-ZeLMURKm.js";const l={__name:"ContactsManageView",setup(o){return(n,t)=>(s(),a("div",null,[...t[0]||(t[0]=[e("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Gestión de Contactos",-1),e("p",{class:"text-gray-600"},"Vista en desarrollo",-1)])]))}};export{l as default};

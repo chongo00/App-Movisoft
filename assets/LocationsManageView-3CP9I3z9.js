@@ -1,1 +1,0 @@
-import{c as a,d as t,o}from"./index-hhJEefJ7.js";const l={__name:"LocationsManageView",setup(s){return(n,e)=>(o(),a("div",null,[...e[0]||(e[0]=[t("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Gestión de Localizaciones",-1),t("p",{class:"text-gray-600"},"Vista en desarrollo",-1)])]))}};export{l as default};
