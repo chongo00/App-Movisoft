@@ -1,1 +1,0 @@
-import{c as o,a,o as t}from"./index-Bxcz_X2Z.js";const c={__name:"LocationFormView",setup(r){return(l,e)=>(t(),o("div",null,[...e[0]||(e[0]=[a("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Localización",-1),a("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de localizaciones",-1)])]))}};export{c as default};

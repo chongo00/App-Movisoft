@@ -1,0 +1,1 @@
+import{c as a,d as e,o as s}from"./index-DqKz071s.js";const o={class:"min-h-screen bg-gray-50 pb-20"},c={__name:"CompanyCatalogView",setup(r){return(l,t)=>(s(),a("div",o,[...t[0]||(t[0]=[e("div",{class:"p-4"},[e("h1",{class:"text-2xl font-bold text-gray-800"},"Catálogo de Empresa"),e("p",{class:"text-gray-600 mt-2"},"Vista en desarrollo")],-1)])]))}};export{c as default};
