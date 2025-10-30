@@ -12,13 +12,13 @@
         <img :src="logoSrc" alt="MoviSoft Logo" class="w-24 h-24 object-contain" />
       </div>
 
-      <h1 class="text-4xl font-bold text-white mb-2">Panel Empresas</h1>
-      <p class="text-primary-100 mb-8">Iniciar Sesión</p>
+      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Panel Empresas</h1>
+      <p class="text-gray-600 dark:text-primary-100 mb-8">Iniciar Sesión</p>
 
       <!-- Formulario -->
       <div class="flex-1 flex flex-col justify-center space-y-6 max-w-md">
         <div>
-          <label class="block text-sm font-medium text-gray-200/80 dark:text-gray-300 mb-2">Email</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
           <input 
             v-model="email"
             type="email" 
@@ -28,7 +28,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-200/80 dark:text-gray-300 mb-2">Contraseña</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contraseña</label>
           <div class="relative">
             <input 
               v-model="password"
@@ -53,15 +53,15 @@
         </button>
 
         <div class="text-center space-y-2">
-          <p class="text-sm text-gray-200/80 dark:text-gray-400">
+          <p class="text-sm text-gray-600 dark:text-white">
             ¿No tienes cuenta de empresa?
-            <router-link to="/auth/register-company" class="text-primary-200 dark:text-primary-300 font-semibold hover:underline ml-1">
+            <router-link to="/auth/register-company" class="text-primary-600 dark:text-primary-300 font-semibold hover:underline ml-1">
               Regístrate aquí
             </router-link>
           </p>
-          <p class="text-sm text-gray-200/80 dark:text-gray-400">
+          <p class="text-sm text-gray-600 dark:text-white">
             ¿Eres cliente?
-            <router-link to="/auth/login-common" class="text-primary-200 dark:text-primary-300 font-semibold hover:underline ml-1">
+            <router-link to="/auth/login-common" class="text-primary-600 dark:text-primary-300 font-semibold hover:underline ml-1">
               Ingresa aquí
             </router-link>
           </p>

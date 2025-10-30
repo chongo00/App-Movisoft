@@ -12,13 +12,13 @@
         <img :src="logoSrc" alt="MoviSoft Logo" class="w-24 h-24 object-contain" />
       </div>
 
-      <h1 class="text-4xl font-bold text-white mb-2">Registro Empresa</h1>
-      <p class="text-primary-100 mb-8">Crea tu cuenta de empresa</p>
+      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Registro Empresa</h1>
+      <p class="text-gray-600 dark:text-primary-100 mb-8">Crea tu cuenta de empresa</p>
 
       <!-- Formulario -->
       <div class="flex-1 flex flex-col space-y-6 max-w-md">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la Empresa</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre de la Empresa</label>
           <input 
             v-model="companyName"
             type="text" 
@@ -28,7 +28,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Responsable</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Responsable</label>
           <input 
             v-model="responsibleName"
             type="text" 
@@ -38,7 +38,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
           <input 
             v-model="email"
             type="email" 
@@ -48,7 +48,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Teléfono</label>
           <input 
             v-model="phone"
             type="tel" 
@@ -58,7 +58,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contraseña</label>
           <div class="relative">
             <input 
               v-model="password"
@@ -82,16 +82,16 @@
           Registrar Empresa
         </button>
 
-        <div class="text-center space-y-2 pb-8">
-          <p class="text-sm text-gray-600">
-            ¿Ya tienes cuenta de empresa?
-            <router-link to="/auth/login-company" class="text-primary-600 font-semibold hover:underline ml-1">
+        <div class="text-center space-y-2">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            ¿Ya tienes una cuenta de empresa?
+            <router-link to="/auth/login-company" class="text-primary-600 dark:text-primary-300 font-semibold hover:underline ml-1">
               Inicia sesión aquí
             </router-link>
           </p>
-          <p class="text-sm text-gray-600">
-            ¿Eres cliente?
-            <router-link to="/auth/register-common" class="text-primary-600 font-semibold hover:underline ml-1">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            ¿Quieres registrarte como usuario?
+            <router-link to="/auth/register-common" class="text-primary-600 dark:text-primary-300 font-semibold hover:underline ml-1">
               Regístrate aquí
             </router-link>
           </p>
