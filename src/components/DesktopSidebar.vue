@@ -8,7 +8,7 @@
     <!-- Header del sidebar -->
     <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-3">
-        <img src="/logo.png" alt="Tu Mercadito" class="w-10 h-10 rounded-xl object-cover" />
+        <img :src="logoSrc" alt="Tu Mercadito" class="w-10 h-10 rounded-xl object-cover" />
         <span class="font-semibold text-gray-900 dark:text-white">Tu Mercadito</span>
       </div>
       <button
@@ -89,6 +89,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useUiStore } from '../stores/ui'
+import { useBranding } from '../composables/useBranding'
 import {
   Home,
   FolderTree,
@@ -99,7 +100,6 @@ import {
   LogOut,
   X
 } from 'lucide-vue-next'
-import MoviSoftLogo from '../components/MoviSoftLogo.vue'
 
 const props = defineProps({
   isOpen: {
@@ -114,6 +114,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
+const { logoSrc } = useBranding()
 
 // Detectar si es desktop
 const isDesktop = computed(() => {
