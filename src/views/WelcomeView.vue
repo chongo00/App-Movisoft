@@ -5,7 +5,7 @@
       <div class="mb-8 mt-12">
         <!-- Logo MoviSoft -->
         <div class="mb-4 flex items-center justify-center">
-          <img src="/logo.png" alt="MoviSoft Logo" class="w-40 h-40 object-contain" />
+          <img :src="logoSrc" alt="MoviSoft Logo" class="w-40 h-40 object-contain" />
         </div>
       </div>
       
@@ -43,8 +43,10 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { Mail } from 'lucide-vue-next'
+import { useBranding } from '../composables/useBranding'
 
 const router = useRouter()
+const { logoSrc } = useBranding()
 
 const navigateToLogin = () => {
   router.push('/login')

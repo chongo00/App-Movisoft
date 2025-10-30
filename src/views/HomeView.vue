@@ -100,7 +100,7 @@
           </button>
           
           <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="MoviSoft" class="w-12 h-12 object-contain" />
+            <img :src="logoSrc" alt="MoviSoft" class="w-12 h-12 object-contain" />
             <div>
               <h1 class="text-xl font-bold">Tu Mercadito</h1>
               <p class="text-xs text-primary-100">Mobile Service</p>
@@ -218,7 +218,7 @@
         <!-- Header del menú -->
         <div class="flex items-center justify-between p-6 border-b border-white/20">
           <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="MoviSoft" class="w-10 h-10 object-contain" />
+            <img :src="logoSrc" alt="MoviSoft" class="w-10 h-10 object-contain" />
             <div>
               <h2 class="text-lg font-bold">Tu Mercadito</h2>
               <p class="text-xs text-primary-100">Explora y Regístrate</p>
@@ -426,6 +426,7 @@ import BottomNavigation from '../components/BottomNavigation.vue'
 import SettingsModal from '../components/SettingsModal.vue'
 import { useUiStore } from '../stores/ui'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
+import { useBranding } from '../composables/useBranding'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -434,6 +435,7 @@ const isMenuOpen = ref(false)
 const isUserMenuOpen = ref(false)
 const uiStore = useUiStore()
 const desktopSidebarOpen = ref(false)
+const { logoSrc } = useBranding()
 
 const quickCategories = ref([
   { id: 1, name: 'Alimentos' },

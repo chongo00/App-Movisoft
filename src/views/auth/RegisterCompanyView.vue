@@ -9,7 +9,7 @@
     <div class="relative z-10 flex-1 flex flex-col p-8 pt-16">
       <!-- Logo -->
       <div class="mb-8">
-        <img src="/logo.png" alt="MoviSoft Logo" class="w-24 h-24 object-contain" />
+        <img :src="logoSrc" alt="MoviSoft Logo" class="w-24 h-24 object-contain" />
       </div>
 
       <h1 class="text-4xl font-bold text-white mb-2">Registro Empresa</h1>
@@ -106,9 +106,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { Lock } from 'lucide-vue-next'
+import { useBranding } from '../../composables/useBranding'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { logoSrc } = useBranding()
 
 const companyName = ref('')
 const responsibleName = ref('')
