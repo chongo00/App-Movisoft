@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'pb-20': authStore.isAuthenticated && authStore.isCommonUser }">
+  <div
+    class="min-h-screen bg-gray-50 dark:bg-gray-900"
+    :class="{ 'pb-20': authStore.isAuthenticated && authStore.isCommonUser }"
+    @touchstart.passive="handleTouchStart"
+    @touchend.passive="handleTouchEnd"
+  >
     <DesktopSidebar
       v-if="authStore.isAuthenticated && authStore.isCommonUser"
       :is-open="desktopSidebarOpen"
@@ -112,6 +117,7 @@
             <div v-if="authStore.isAuthenticated" class="relative">
               <Tooltip content="Opciones de usuario">
                 <button 
+                  ref="userMenuButtonRef"
                   @click="toggleUserMenu"
                   class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary-600 bg-white rounded-full hover:bg-primary-50 transition-all duration-200"
                 >
@@ -131,6 +137,7 @@
                 leave-to-class="opacity-0 scale-95 translate-y-[-10px]"
               >
                 <div 
+                  ref="userMenuRef"
                   v-if="isUserMenuOpen"
                   class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
                   @click.stop
@@ -416,7 +423,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Package, Store, MapPin, Utensils, Shirt, Laptop, Home as HomeIcon, X, User, ChevronDown, LogOut, MessageCircle, Settings } from 'lucide-vue-next'
 import ProductSkeleton from '../components/ProductSkeleton.vue'
@@ -436,6 +443,19 @@ const isUserMenuOpen = ref(false)
 const uiStore = useUiStore()
 const desktopSidebarOpen = ref(false)
 const { logoSrc } = useBranding()
+const userMenuButtonRef = ref(null)
+const userMenuRef = ref(null)
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+const touchEndX = ref(0)
+const touchEndY = ref(0)
+
+const isDesktop = computed(() => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth >= 1024
+  }
+  return false
+})
 
 const quickCategories = ref([
   { id: 1, name: 'Alimentos' },
@@ -548,6 +568,53 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/')
 }
+
+const handleTouchStart = (event) => {
+  if (isDesktop.value) return
+
+  const touch = event.changedTouches[0]
+  touchStartX.value = touch.screenX
+  touchStartY.value = touch.screenY
+}
+
+const handleTouchEnd = (event) => {
+  if (isDesktop.value) return
+
+  const touch = event.changedTouches[0]
+  touchEndX.value = touch.screenX
+  touchEndY.value = touch.screenY
+
+  const deltaX = touchStartX.value - touchEndX.value
+  const deltaY = touchStartY.value - touchEndY.value
+
+  if (Math.abs(deltaX) <= Math.abs(deltaY) || deltaX < 60) return
+  if (!authStore.isAuthenticated || !authStore.isCommonUser) return
+  if (isMenuOpen.value || isUserMenuOpen.value) return
+
+  if (router.currentRoute.value.path !== '/app/categories') {
+    router.push('/app/categories')
+  }
+}
+
+const handleDocumentClick = (event) => {
+  if (!isUserMenuOpen.value) return
+
+  const buttonEl = userMenuButtonRef.value
+  const menuEl = userMenuRef.value
+
+  if (buttonEl && buttonEl.contains(event.target)) return
+  if (menuEl && menuEl.contains(event.target)) return
+
+  isUserMenuOpen.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
 </script>
 
 <style scoped>
