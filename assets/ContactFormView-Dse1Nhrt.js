@@ -1,0 +1,1 @@
+import{b as o,f as e,s as a}from"./index-CXv7rLUD.js";const n={__name:"ContactFormView",setup(r){return(s,t)=>(a(),o("div",null,[...t[0]||(t[0]=[e("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Contacto",-1),e("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de contactos",-1)])]))}};export{n as default};

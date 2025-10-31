@@ -1,1 +1,0 @@
-import{c as a,d as o,o as t}from"./index-ZeLMURKm.js";const c={__name:"LocationFormView",setup(r){return(l,e)=>(t(),a("div",null,[...e[0]||(e[0]=[o("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Localización",-1),o("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de localizaciones",-1)])]))}};export{c as default};

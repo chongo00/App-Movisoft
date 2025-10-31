@@ -1,0 +1,1 @@
+import{b as o,f as a,s as t}from"./index-CXv7rLUD.js";const n={__name:"LocationFormView",setup(r){return(s,e)=>(t(),o("div",null,[...e[0]||(e[0]=[a("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Localización",-1),a("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de localizaciones",-1)])]))}};export{n as default};

@@ -1,0 +1,1 @@
+import{b as s,f as e,s as a}from"./index-CXv7rLUD.js";const o={class:"min-h-screen bg-gray-50 pb-20"},n={__name:"ProductDetailView",setup(r){return(l,t)=>(a(),s("div",o,[...t[0]||(t[0]=[e("div",{class:"p-4"},[e("h1",{class:"text-2xl font-bold text-gray-800"},"Detalle de Producto"),e("p",{class:"text-gray-600 mt-2"},"Vista en desarrollo")],-1)])]))}};export{n as default};

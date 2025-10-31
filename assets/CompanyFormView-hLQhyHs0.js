@@ -1,0 +1,1 @@
+import{b as r,f as a,s}from"./index-CXv7rLUD.js";const m={__name:"CompanyFormView",setup(t){return(o,e)=>(s(),r("div",null,[...e[0]||(e[0]=[a("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Empresa",-1),a("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de empresas",-1)])]))}};export{m as default};

@@ -1,0 +1,1 @@
+import{b as o,f as t,s as r}from"./index-CXv7rLUD.js";const c={__name:"ProductFormView",setup(s){return(a,e)=>(r(),o("div",null,[...e[0]||(e[0]=[t("h1",{class:"text-3xl font-bold text-gray-800 mb-6"},"Formulario de Producto",-1),t("p",{class:"text-gray-600"},"Vista en desarrollo - CRUD de productos",-1)])]))}};export{c as default};
